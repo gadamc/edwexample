@@ -6,14 +6,14 @@ You'll first need a Cloudant account (or local CouchDB) and a database to hold y
 
 1. pip install requests
 2. edit edw.ini
-![Step 2](img/edit_ini.png)
+![Step 2](img/edit_ini.jpg)
 3. python upload_design.py
 4. open two terminals and run the "listener" scripts
 	* python listen_newfiles.py
 	* python listen_analysis1.py
-![After Step 4](img/upload_design_start_listeners.png)
+![After Step 4](img/upload_design_start_listeners.jpg)
 5. python make_metadata.py 1  
-![After Step 5](img/push_one_doc.png)
+![After Step 5](img/push_one_doc.jpg)
 
 
 In this last step, the number in argument to the script is the number of new docs to create and add to the database. You can change this number, of course.

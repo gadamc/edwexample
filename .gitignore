@@ -1,4 +1,3 @@
 *.pyc
 local.edw.ini
 my.edw.ini
-couchapp/*

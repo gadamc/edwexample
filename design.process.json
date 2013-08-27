@@ -1,12 +1,17 @@
-{"_id":"_design/process",
-"filters":{
-    "with_process":"function(doc, req){\n\n  if(!doc.process)\n    return false;\n\n  if (req.query.last) {\n      \n    if(doc.process.length == 0)\n      return req.query.last === '0';\n        \n    return doc.process[ doc.process.length-1 ].name === req.query.last;\n  }\n\n  //could add other query parameters, such as 'first' or size to match against the number of values in the doc.process array\n\n  return false;\n}"
+{
+  "_id": "_design/process",    
+  "views": {
+    "status": {
+      "reduce": "_sum",
+      "map": "function(doc){\n  if(doc.status){\n    emit(doc.status, 1);\n  }\n}"
     },
-"language":"javascript",
-"views":{
     "lastproc": {
-        "map":"function (doc) {\n    if (doc.status === 'good' && doc.conditions && doc.process) {\n    \tif(doc.process.length == 0)\n        \temit([0, doc._id], doc.conditions);\n        else if (doc.process[ doc.process.length-1 ].name) //emit the last process completed\n        \temit( [doc.process[ doc.process.length-1 ].name, doc._id], doc.conditions);\n    }\n}",
-        "reduce":"_count"
-        }
+      "reduce": "_count",
+      "map": "function (doc) {\n    if (doc.status === 'good' && doc.conditions && doc.process) {\n    \tif(doc.process.length == 0)\n        \temit([0, doc._id], doc.conditions);\n        else if (doc.process[ doc.process.length-1 ].name) //emit the last process completed\n        \temit( [doc.process[ doc.process.length-1 ].name, doc._id], doc.conditions);\n    }\n}"
     }
+  },
+  "language": "javascript",
+  "filters": {
+    "with_process": "function(doc, req){\n\n  if(!doc.process)\n    return false;\n\n  if (req.query.last) {\n      \n    if(doc.process.length == 0)\n      return req.query.last === '0';\n        \n    return doc.process[ doc.process.length-1 ].name === req.query.last;\n  }\n\n  //could add other query parameters, such as 'first' or size to match against the number of values in the doc.process array\n\n  return false;\n}"
+  }
 }

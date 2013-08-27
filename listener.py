@@ -1,23 +1,15 @@
-import ConfigParser
 import requests 
 import json
-import apptools
-import copy
-import os
+import datetime
 
-def run(filter, callback, configfile='edw.ini'):
-
-  (c_server, c_dbname, c_username, c_password, c_viewname) = apptools.readconfig(configfile)
-
-  headers = {'content-type': 'application/json'}
-  auth = (c_username, c_password)
+def run(filter, callback, anAppConfig):
 
 
   #..  set up continuous polling from _changes.
   #      for simplicity, only look for any changes after this
   #      script has started. To do this, first get the 
   #      latest sequence value from the database
-  initial_seq = apptools.getcurrentsequence()
+  initial_seq = getcurrentsequence( anAppConfig )
   print 'listening for new files starting from sequence:', initial_seq
 
 
@@ -30,18 +22,18 @@ def run(filter, callback, configfile='edw.ini'):
   }
 
   changes = requests.get(
-    '%s/%s/_changes?filter=%s' % (c_server, c_dbname, filter),
-    params=params,
-    stream=True,
-    auth=auth, headers=headers
+    '%s/%s/_changes?filter=%s' % (anAppConfig.server, anAppConfig.dbname, filter),  #filter is specified here
+    params = params,
+    stream = True,
+    auth = anAppConfig.auth, 
+    headers = anAppConfig.headers
   )
 
   #..  User iter_lines to get new data returned by _changes
   #
-  for line in changes.iter_lines(chunk_size=2):
+  for line in changes.iter_lines(chunk_size=1):
     if line:  # filter out keep-alive new lines
-      print 'caught line'
-      print line
+      print datetime.datetime.now(), 'caught line:', line
       callback(line)
 
     else:
@@ -49,3 +41,12 @@ def run(filter, callback, configfile='edw.ini'):
       pass
 
   print 'Hey! Why did I die!'
+
+
+def getcurrentsequence(anAppConfig):
+  
+  url = '%s/%s' % (anAppConfig.server, anAppConfig.dbname)
+
+  r = requests.get(url, auth=anAppConfig.auth, headers=anAppConfig.headers)
+  
+  return r.json()['update_seq']

@@ -8,13 +8,18 @@ Run this script to upload the _design/process document.
 '''
 
 #read credentials configuration
-(c_server, c_dbname, c_username, c_password, c_viewname) = apptools.readconfig('edw.ini')
+myconfig =  apptools.appConfig('edw.ini')
 
 f = open('design.process.json')
+
 doc = json.load(f)
+url = '%s/%s/%s' % (myconfig.server, myconfig.dbname, doc['_id'])
 
-url = '%s/%s/%s' % (c_server, c_dbname, doc['_id'])
+#if this _design doc already exists on the database, then replace it with the data in the file. must get _rev
+r = requests.head(url, auth=myconfig.auth,  headers=myconfig.headers)
+if r.status_code == 200:
+  doc['_rev'] = r.headers['etag'].strip('"')
 
-r = requests.put(url, auth=apptools.auth, data=json.dumps(doc), headers= apptools.headers)
+r = requests.put(url, auth=myconfig.auth, data=json.dumps(doc), headers= myconfig.headers)
 
 print 'HTTP GET return code:', r.status_code

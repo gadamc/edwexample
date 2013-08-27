@@ -66,6 +66,8 @@ def getnextrun(anAppConfig):
       match = re.search('[0-9]{3,}_[0-9]{3,}', r.json()['rows'][0]['id'])
       if match:
         return int( match.group(0).split('_')[0]) + 1
+      else:
+        return 0
     except IndexError: #assume this is because 'rows' is an empty array
       return 0
 

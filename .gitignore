@@ -1,3 +1,5 @@
 *.pyc
 local.edw.ini
 my.edw.ini
+*~
+.DS_Store

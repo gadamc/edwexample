@@ -1,31 +1,37 @@
 #Example Process Management tool using Cloudant
 
-The code in this repository exemplifies the process management system described in the Cloudant Blog post about the EDELWEISS experiment. In EDELWEISS we have built a system based on the Cloudant database service that monitors and drives the processing steps of our physics data. This is done by creating a JSON document on Cloudant for each physics data file produced by our experiment (roughy 5 physics data files per hour). We use the _changes feed as a notification system for when new JSON documents are added to the database or updated.  When notified, we use a Mapreduce view to find and read the JSON documents and perform the necessary actions on the physics data files. 
+The python scripts in this repository exemplify the process management system described in the three part Cloudant Blog post about the EDELWEISS experiment (parts [1](https://cloudant.com/blog/searching-for-dark-matter-with-cloudant-part-1/), [2](https://cloudant.com/blog/searching-for-dark-matter-with-cloudant-part2/), and [3](https://cloudant.com/blog/searching-for-dark-matter-with-cloudant-part3/)). In EDELWEISS we have built a system based on the Cloudant database service that monitors and drives the processing steps of our physics data. This is done by creating a JSON document on Cloudant for each physics data file produced by our experiment (roughy 5 data files per hour). The documents hold the metadata for each data file, including experimental run condtions and the results of each step in the processing chain. 
 
 In this example, two steps of the data processing chain in EDELWEISS are simulated. The first step moves the physics data files from the experiment site to our data processing center. The second step simulates the results of performing a first step in the physics analysis (digital signal processing). 
 
-There are five steps to run this example code:
-* install the requirements
-* set the credentials
-* upload the _design document
-* run a python script to add new documents to the database
-* run two python scripts that simulate the data processing and update of the metadata documents. 
+This system works by a combination of a filtered _changes feed and a Mapreduce view that act as a notification system for when new JSON documents are added to the database or updated. New or updated documents trigger the execution of callback functions that perform the appropriate operation on the physics data files. The results of the callback are then added back to the JSON document on Cloudant, which then triggers the subsequent processing step.
+
+The steps to run this example code are
+
+* Install the requirements
+* Configure/Setup 
+    * credentials 
+    * _design document
+* Run
+    * script to add new documents to the database
+    * two scripts that simulate the data processing and update of the metadata documents. 
 
 ## Requirements
 
     pip install requests
     pip install couchapp # optional
 
-## Setup
-Sign up for a Cloudant account (or install a local CouchDB) and create an example database, e.g. 'edwexample'
+## Configuration
 
-Edit the edw.ini file (don't change the viewname).
+[Sign up for a Cloudant account](https://cloudant.com/sign-up/) (or install a local CouchDB) and create an example database, e.g. 'edwexample'
 
-One can upload the design document in two ways. The python script, upload_design.py, reads the design.process.json file and PUTs it to your database using the credentials in edw.ini.
+Edit the edw.ini file (but don't change the viewname).
+
+Upload the design document. This can be done in two ways. The python script, upload_design.py, reads the design.process.json file and PUTs it to your database using the credentials in edw.ini.
 
     python upload_design.py
 
-Or, you may use the couchapp tool. The couchapp tool (or [erica](https://github.com/benoitc/erica)) is the recommended method for installing production couchapps and _design documents and its use is quite simple. 
+Or, you may use the couchapp tool. The couchapp tool (or [erica](https://github.com/benoitc/erica)) is the recommended method for installing production couchapps and _design documents and its use is quite simple. The couchapp tool reads a folder structure, produces the _design document in JSON and uploads it to the database.
 
     cd couchapp
     couchapp push https://<username>:<password>@<username>.cloudant.com/<dbname>
@@ -36,7 +42,7 @@ You'll need three terminal windows open to watch the scripts in action. The foll
 
 #### New documents
 
-First, upload some example documents to the database. 
+First, open a terminal and upload some example documents to the database. 
 
     python make_metadata.py 2  # uploads 2 documents
 
@@ -75,7 +81,7 @@ You can see a few of the example run conditions, such as the temperature - with 
 
 #### Listener scripts
 
-In the second and third terminal, turn on the 'listener' scripts.
+In a second and third terminal, turn on the 'listener' scripts.
 
     python listen_newfiles.py
     python listen_analysis1.py

@@ -16,8 +16,13 @@ The steps to run this example code are
     * script to add new documents to the database
     * two scripts that simulate the data processing and update of the metadata documents. 
 
-## Requirements
 
+## Installation
+
+    pip install virtualenv 
+    git clone https://github.com/gadamc/edwexample
+    cd edwexample
+    virtualenv venv && source venv/bin/activate
     pip install requests
     pip install couchapp # optional
 
@@ -25,11 +30,7 @@ The steps to run this example code are
 
 [Sign up for a Cloudant account](https://cloudant.com/sign-up/) (or install a local CouchDB) and create an example database, e.g. 'edwexample'. 
 
-Clone this repository.
-
-    git clone https://github.com/gadamc/edwexample
-
-Edit the edw.ini file (but don't change the viewname).
+Edit the edw.ini file with your credentials (but don't change the viewname).
 
 Upload the design document. This can be done in two ways. The python script, upload_design.py, reads the design.process.json file and PUTs it to your database using the credentials in edw.ini.
 
@@ -46,7 +47,7 @@ You'll need three terminal windows open to watch the scripts in action. The foll
 
 #### New documents
 
-First, open a terminal and upload some example documents to the database. 
+First, upload some example documents to the database. 
 
     python make_metadata.py 2  # uploads 2 documents
 
@@ -87,7 +88,12 @@ You can see a few of the example run conditions, such as the temperature - with 
 
 In a second and third terminal, turn on the 'listener' scripts.
 
+    cd edwexample
+    source venv/bin/activate
     python listen_newfiles.py
+
+    cd edwexample
+    source venv/bin/activate
     python listen_analysis1.py
 
 The 'listener' scripts wait for any output from the _changes feed that occurs after the script was started (see the listener.py code for how it gets the latest sequence number from the database and waits for all events after that sequence number.)  Both of these listener scripts observe the _changes feed through a filter function (defined in the _design document) and then run a callback function for new or updated documents on the database that are emitted by the MapReduce function. 

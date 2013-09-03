@@ -79,7 +79,7 @@ Each document looks something like this:
             },
             "temperature": 0.015842423014516688
             },
-    "original_file": "/mnt/data/ma22a000_000.root"
+        "original_file": "/mnt/data/ma22a000_000.root"
     }
 
 You can see a few of the example run conditions, such as the temperature - with a ridiculously high implied precision, and voltages applied to the germanium crystals. The "original_file" holds the path to the physics data file on the data acquisition machine.  The "process" key is where the process management stores results from different steps in the processing chain. Its also where the MapReduce function (_design/process/_view/lastproc) looks to emit information about the last processing step performed on the physics document. 

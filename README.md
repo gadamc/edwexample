@@ -23,7 +23,11 @@ The steps to run this example code are
 
 ## Configuration
 
-[Sign up for a Cloudant account](https://cloudant.com/sign-up/) (or install a local CouchDB) and create an example database, e.g. 'edwexample'
+[Sign up for a Cloudant account](https://cloudant.com/sign-up/) (or install a local CouchDB) and create an example database, e.g. 'edwexample'. 
+
+Clone this repository.
+
+    git clone https://github.com/gadamc/edwexample
 
 Edit the edw.ini file (but don't change the viewname).
 

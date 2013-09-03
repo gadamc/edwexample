@@ -60,8 +60,7 @@ Each document looks something like this:
         "md5sum": "977f5c2288038a593d04eb35b08670b2",
         "run": "ma22a000",
         "datecreated": 1378222673.477208,
-        "process": [
-        ],
+        "process": [],
         "conditions": {
             "volts": {
                 "detector_a": [
@@ -78,7 +77,7 @@ Each document looks something like this:
                 ]
             },
             "temperature": 0.015842423014516688
-            },
+        },
         "original_file": "/mnt/data/ma22a000_000.root"
     }
 

@@ -4,7 +4,7 @@ The python scripts in this repository exemplify the process management system de
 
 In this example, two steps of the data processing chain in EDELWEISS are simulated. The first step moves the physics data files from the experiment site to our data processing center. The second step simulates the results of performing a first step in the physics analysis (digital signal processing). 
 
-This system works by a combination of a filtered _changes feed and a Mapreduce view that act as a notification system for when new JSON documents are added to the database or updated. New or updated documents trigger the execution of callback functions that perform the appropriate operation on the physics data files. The results of the callback are then added back to the JSON document on Cloudant, which then triggers the subsequent processing step.
+This system works by a combination of a filtered _changes feed and a MapReduce view that act as a notification system for when new JSON documents are added to the database or updated. New or updated documents trigger the execution of callback functions that perform the appropriate operation on the physics data files. The results of the callback are then added back to the JSON document on Cloudant, which then triggers the subsequent processing step.
 
 The steps to run this example code are
 
@@ -77,7 +77,7 @@ Each document looks something like this:
     "original_file": "/mnt/data/ma22a000_000.root"
     }
 
-You can see a few of the example run conditions, such as the temperature - with a ridiculously high implied precision, and voltages applied to the germanium crystals. The "original_file" holds the path to the physics data file on the data acquisition machine.  The "process" key is where the process management stores results from different steps in the processing chain. Its also where the Mapreduce function (_design/process/_view/lastproc) looks to emit information about the last processing step performed on the physics document. 
+You can see a few of the example run conditions, such as the temperature - with a ridiculously high implied precision, and voltages applied to the germanium crystals. The "original_file" holds the path to the physics data file on the data acquisition machine.  The "process" key is where the process management stores results from different steps in the processing chain. Its also where the MapReduce function (_design/process/_view/lastproc) looks to emit information about the last processing step performed on the physics document. 
 
 #### Listener scripts
 
@@ -86,13 +86,13 @@ In a second and third terminal, turn on the 'listener' scripts.
     python listen_newfiles.py
     python listen_analysis1.py
 
-The 'listener' scripts wait for any output from the _changes feed that occurs after the script was started (see the listener.py code for how it gets the latest sequence number from the database and waits for all events after that sequence number.)  Both of these listener scripts observe the _changes feed through a filter function (defined in the _design document) and then run a callback function for new or updated documents on the database that are emitted by the Mapreduce function. 
+The 'listener' scripts wait for any output from the _changes feed that occurs after the script was started (see the listener.py code for how it gets the latest sequence number from the database and waits for all events after that sequence number.)  Both of these listener scripts observe the _changes feed through a filter function (defined in the _design document) and then run a callback function for new or updated documents on the database that are emitted by the MapReduce function. 
 
-The Mapreduce function emits key:value pairs that look like ['name', doc['_id']] : 1. The 'name' is value of doc['process'][N-1]['name'], where N is the length of doc['process']. If doc['process'] is an empty list, the Mapreduce function emits the key:value pair [0, doc['_id']] : 1. One then queries the Mapreduce function with appropriate startkey and endkey values to select documents that represent physics data files at particular points in the data processing chain. 
+The MapReduce function emits key:value pairs that look like ['name', doc['_id']] : 1. The 'name' is value of doc['process'][N-1]['name'], where N is the length of doc['process']. If doc['process'] is an empty list, the MapReduce function emits the key:value pair [0, doc['_id']] : 1. One then queries the MapReduce function with appropriate startkey and endkey values to select documents that represent physics data files at particular points in the data processing chain. 
 
-The listen_newfiles.py script handles new physics data files. It gets documents from the Mapreduce view with key = [0, doc.['_id']]. Its job is to move the data files from the computers in the underground lab to our batch processing system. This is simulated here by adding the first item to the doc['process'] list 'name':'move_to_sps'.
+The listen_newfiles.py script handles new physics data files. It gets documents from the MapReduce view with key = [0, doc.['_id']]. Its job is to move the data files from the computers in the underground lab to our batch processing system. This is simulated here by adding the first item to the doc['process'] list 'name':'move_to_sps'.
 
-The listen_analysis1.py script handles data files that have been moved to the batch processing system. It gets documents emitted by the Mapreduce view with key = ["move_to_sps", doc['_id']]. Its job is to perform some signal processing on the raw physics data file and to store the results of those data in a new physics data file (you'll see the 'newfile' in the listen_analysis1.py code)
+The listen_analysis1.py script handles data files that have been moved to the batch processing system. It gets documents emitted by the MapReduce view with key = ["move_to_sps", doc['_id']]. Its job is to perform some signal processing on the raw physics data file and to store the results of those data in a new physics data file (you'll see the 'newfile' in the listen_analysis1.py code)
 
 To see this in action, add a new document to the database
 

@@ -43,7 +43,7 @@ Or, you may use the couchapp tool. The couchapp tool (or [erica](https://github.
 
 ## Running the example code
 
-You'll need three terminal windows open to watch the scripts in action. The following will show you how to run the example and explain what is happening. 
+You'll need three terminal windows open to watch the scripts in action. The following will show you how to run the example and explain what is happening. The scripts in this example will print to screen to show you what is happening.
 
 #### New documents
 
@@ -98,11 +98,13 @@ In a second and third terminal, turn on the 'listener' scripts.
 
 The 'listener' scripts wait for any output from the _changes feed that occurs after the script was started (see the listener.py code for how it gets the latest sequence number from the database and waits for all events after that sequence number.)  Both of these listener scripts observe the _changes feed through a filter function (defined in the _design document) and then run a callback function for new or updated documents on the database that are emitted by the MapReduce function. 
 
-The MapReduce function emits key:value pairs that look like ['name', doc['_id']] : 1. The 'name' is value of doc['process'][N-1]['name'], where N is the length of doc['process']. If doc['process'] is an empty list, the MapReduce function emits the key:value pair [0, doc['_id']] : 1. One then queries the MapReduce function with appropriate startkey and endkey values to select documents that represent physics data files at particular points in the data processing chain. 
+The MapReduce function emits key:value pairs that look like ['name', doc['_id']] : 1. The 'name' is value of doc['process'][N-1]['name'], where N is the length of doc['process']. If doc['process'] is an empty list, the MapReduce function emits the key:value pair [0, doc['_id']] : 1. One then queries the MapReduce function with appropriate startkey and endkey values to select documents that represent physics data files at particular steps in the data processing chain. 
 
-The listen_newfiles.py script handles new physics data files. It gets documents from the MapReduce view with key = [0, doc.['_id']]. Its job is to move the data files from the computers in the underground lab to our batch processing system. This is simulated here by adding the first item to the doc['process'] list 'name':'move_to_sps'.
+The listen_newfiles.py and listen_analysis1.py scripts both define a callback function and then run the listener.run function with appropriate arguments.
 
-The listen_analysis1.py script handles data files that have been moved to the batch processing system. It gets documents emitted by the MapReduce view with key = ["move_to_sps", doc['_id']]. Its job is to perform some signal processing on the raw physics data file and to store the results of those data in a new physics data file (you'll see the 'newfile' in the listen_analysis1.py code)
+The listen_newfiles.py script handles new physics data files. It gets documents from the MapReduce view with key = [0, doc.['_id']]. Its job is to move the data files from the computers in the underground lab to our batch processing system. The results of that file transfer are then added as the first item to the doc['process'] list with 'name':'move_to_sps'.
+
+The listen_analysis1.py script handles data files that have been moved to the batch processing system. It gets documents emitted by the MapReduce view with key = ["move_to_sps", doc['_id']]. Its job is to perform some signal processing on the raw physics data file and to store the results of those data in a new physics data file (you'll see the 'newfile' in the listen_analysis1.py code). The results of that job are then added as the next item in the doc['process'] list with 'name':'signal_processing'.
 
 To see this in action, add a new document to the database
 
@@ -111,9 +113,5 @@ To see this in action, add a new document to the database
 Here's a screenshot similar to what you should now see.
 ![Push data and response](push_new_docs.jpg)
 
-
-As you can probably imagine, its not so difficult to add subsequent processing steps in a similar way. 
-
-
-
+As you can probably imagine, its not so difficult to add subsequent processing steps following this pattern.  
 

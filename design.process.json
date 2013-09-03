@@ -7,7 +7,7 @@
     },
     "lastproc": {
       "reduce": "_count",
-      "map": "function (doc) {\n    if (doc.status === 'good' && doc.conditions && doc.process) {\n    \tif(doc.process.length == 0)\n        \temit([0, doc._id], doc.conditions);\n        else if (doc.process[ doc.process.length-1 ].name) //emit the last process completed\n        \temit( [doc.process[ doc.process.length-1 ].name, doc._id], doc.conditions);\n    }\n}"
+      "map": "function(doc) {\n    if (doc.status === 'good' && doc.conditions && doc.process) {\n    \tif(doc.process.length == 0)\n        \temit([0, doc._id], doc.conditions);\n        else if (doc.process[ doc.process.length-1 ].name) //emit the last process completed\n        \temit( [doc.process[ doc.process.length-1 ].name, doc._id], doc.conditions);\n    }\n}"
     }
   },
   "language": "javascript",

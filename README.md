@@ -43,7 +43,7 @@ Or, you may use the couchapp tool. The couchapp tool (or [erica](https://github.
 
 ## Running the example code
 
-You'll need three terminal windows open to watch the scripts in action. The following will show you how to run the example and explain what is happening. The scripts in this example will print to screen to show you what is happening.
+You'll need three terminal windows open to watch the scripts in action. The following will show you how to run the example and explain what is happening. The scripts in this example print to screen to show each step.
 
 #### New documents
 
